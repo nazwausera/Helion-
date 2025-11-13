@@ -1,132 +1,132 @@
-żądania importu
-z bs4 import BeautifulSoup
-importuj json
-z importu datetime datetime
+import requests
+from bs4 import BeautifulSoup
+import json
+from datetime import datetime
 
 def scrape_helion():
-    próbować:
+    try:
         url = 'https://helion.pl/'
-        nagłówki = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        odpowiedź = żądania.get(url, nagłówki=nagłówki, limit czasu=10)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(url, headers=headers, timeout=10)
         response.encoding = 'utf-8'
-        zupa = PięknaZupa(zawartośćodpowiedzi, 'html.parser')
+        soup = BeautifulSoup(response.content, 'html.parser')
         
-        promocje = []
-        elementy = soup.find_all('div', class_='prod-item-sm', limit=2)
+        promotions = []
+        items = soup.find_all('div', class_='prod-item-sm', limit=2)
         
-        dla i, element w enumerate(elementy):
-            próbować:
+        for i, item in enumerate(items):
+            try:
                 title_elem = item.find('a', class_='prod-title')
                 price_elem = item.find('span', class_='prod-price-now')
                 
-                jeśli title_elem i price_elem:
+                if title_elem and price_elem:
                     title = title_elem.get_text(strip=True)[:100]
-                    cena = price_elem.get_text(strip=True)
+                    price = price_elem.get_text(strip=True)
                     promo_type = 'Książka Tygodnia' if i == 0 else 'Kurs Tygodnia'
                     
-                    promocje.append({
-                        'sklep': 'Helion',
-                        'type': typ_promocji,
-                        'tytuł': tytuł,
-                        'cena': cena,
+                    promotions.append({
+                        'store': 'Helion',
+                        'type': promo_type,
+                        'title': title,
+                        'price': price,
                         'url': 'https://helion.pl/'
                     })
-            z wyjątkiem:
-                przechodzić
+            except:
+                pass
         
-        promocje zwrotne
-    z wyjątkiem wyjątku jako e:
+        return promotions
+    except Exception as e:
         print(f"Błąd Helion: {e}")
-        powrót []
+        return []
 
 def scrape_onepress():
-    próbować:
+    try:
         url = 'https://onepress.pl/'
-        nagłówki = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        odpowiedź = żądania.get(url, nagłówki=nagłówki, limit czasu=10)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(url, headers=headers, timeout=10)
         response.encoding = 'utf-8'
-        zupa = PięknaZupa(zawartośćodpowiedzi, 'html.parser')
+        soup = BeautifulSoup(response.content, 'html.parser')
         
-        promocje = []
-        elementy = soup.find_all('div', class_='prod-item-sm', limit=1)
+        promotions = []
+        items = soup.find_all('div', class_='prod-item-sm', limit=1)
         
-        dla pozycji w pozycjach:
-            próbować:
+        for item in items:
+            try:
                 title_elem = item.find('a', class_='prod-title')
                 price_elem = item.find('span', class_='prod-price-now')
                 
-                jeśli title_elem i price_elem:
+                if title_elem and price_elem:
                     title = title_elem.get_text(strip=True)[:100]
-                    cena = price_elem.get_text(strip=True)
+                    price = price_elem.get_text(strip=True)
                     
-                    promocje.append({
-                        'sklep': 'Onepress',
-                        „typ”: „Książka Tygodnia”,
-                        'tytuł': tytuł,
-                        'cena': cena,
+                    promotions.append({
+                        'store': 'Onepress',
+                        'type': 'Książka Tygodnia',
+                        'title': title,
+                        'price': price,
                         'url': 'https://onepress.pl/'
                     })
-            z wyjątkiem:
-                przechodzić
+            except:
+                pass
         
-        promocje zwrotne
-    z wyjątkiem wyjątku jako e:
-        print(f"Bład Onepress: {e}")
-        powrót []
+        return promotions
+    except Exception as e:
+        print(f"Błąd Onepress: {e}")
+        return []
 
 def scrape_ebookpoint():
-    próbować:
+    try:
         url = 'https://ebookpoint.pl/'
-        nagłówki = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        odpowiedź = żądania.get(url, nagłówki=nagłówki, limit czasu=10)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(url, headers=headers, timeout=10)
         response.encoding = 'utf-8'
-        zupa = PięknaZupa(zawartośćodpowiedzi, 'html.parser')
+        soup = BeautifulSoup(response.content, 'html.parser')
         
-        promocje = []
-        elementy = soup.find_all('div', class_='prod-item-sm', limit=3)
-        typy = ['Książka Dnia', 'Audiobook Dnia', 'Kurs Tygodnia']
+        promotions = []
+        items = soup.find_all('div', class_='prod-item-sm', limit=3)
+        types = ['Książka Dnia', 'Audiobook Dnia', 'Kurs Tygodnia']
         
-        dla i, element w enumerate(elementy):
-            próbować:
+        for i, item in enumerate(items):
+            try:
                 title_elem = item.find('a', class_='prod-title')
                 price_elem = item.find('span', class_='prod-price-now')
                 
-                jeśli title_elem i price_elem:
+                if title_elem and price_elem:
                     title = title_elem.get_text(strip=True)[:100]
-                    cena = price_elem.get_text(strip=True)
+                    price = price_elem.get_text(strip=True)
                     
-                    promocje.append({
-                        'sklep': 'Ebookpoint',
-                        'type': types[i] jeśli i < len(types) w przeciwnym razie 'Promocja',
-                        'tytuł': tytuł,
-                        'cena': cena,
+                    promotions.append({
+                        'store': 'Ebookpoint',
+                        'type': types[i] if i < len(types) else 'Promocja',
+                        'title': title,
+                        'price': price,
                         'url': 'https://ebookpoint.pl/'
                     })
-            z wyjątkiem:
-                przechodzić
+            except:
+                pass
         
-        promocje zwrotne
-    z wyjątkiem wyjątku jako e:
-        print(f"Bład Ebookpoint: {e}")
-        powrót []
+        return promotions
+    except Exception as e:
+        print(f"Błąd Ebookpoint: {e}")
+        return []
 
 def main():
-    print("đŸ” Rozpoczynanie skrobania...)
+    print("🔍 Rozpoczynanie scrapingu...")
     
-    wszystkie_promocje = []
+    all_promotions = []
     all_promotions.extend(scrape_helion())
     all_promotions.extend(scrape_onepress())
     all_promotions.extend(scrape_ebookpoint())
     
-    dane = {
-        'zaktualizowano': datetime.now().isoformat(),
-        'promocje': wszystkie_promocje
+    data = {
+        'updated': datetime.now().isoformat(),
+        'promotions': all_promotions
     }
     
-    z otwartym('promocje.json', 'w', kodowanie='utf-8') jako f:
-        json.dump(dane, f, Ensure_ascii=False, indent=2)
+    with open('promocje.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
     
-    print(f"âœ… Zapisano {len(all_promotions)} promocja!")
+    print(f"✅ Zapisano {len(all_promotions)} promocji!")
 
-jeśli __name__ == '__main__':
-    główny()
+if __name__ == '__main__':
+    main()
