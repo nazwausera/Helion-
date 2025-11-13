@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promocje Książek - Live</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .store {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .type {
+            color: #999;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .title {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .price {
+            font-size: 1.4em;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .link {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .link:hover {
+            background: #764ba2;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 50px 20px;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Promocje Książek</h1>
+            <div class="info">
+                ℹ️ Bieżące promocje z Helion, Onepress i Ebookpoint
+            </div>
+        </header>
+
+        <div id="content" class="grid">
+            <div class="loading">⏳ Ładowanie promocji...</div>
+        </div>
+
+        <div class="footer">
+            <p>Ostatnia aktualizacja: <span id="update-time">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        async function loadPromotions() {
+            try {
+                const response = await fetch('promocje.json');
+                if (!response.ok) throw new Error('Plik nie znaleziony');
+                
+                const data = await response.json();
+                displayPromotions(data);
+            } catch (error) {
+                console.error('Błąd:', error);
+                document.getElementById('content').innerHTML = 
+                    '<div class="error">❌ Nie udało się załadować promocji. Spróbuj ponownie za chwilę.</div>';
+            }
+        }
+
+        function displayPromotions(data) {
+            const content = document.getElementById('content');
+            const promotions = data.promotions || [];
+
+            if (promotions.length === 0) {
+                content.innerHTML = '<div class="error">Brak dostępnych promocji</div>';
+                return;
+            }
+
+            content.innerHTML = promotions.map(promo => `
+                <div class="card">
+                    <div class="store">${promo.store}</div>
+                    <div class="type">${promo.type}</div>
+                    <div class="title">${promo.title}</div>
+                    <div class="price">${promo.price}</div>
+                    <a href="${promo.url}" target="_blank" class="link">Przejdź →</a>
+                </div>
+            `).join('');
+
+            // Aktualizuj czas
+            if (data.updated) {
+                const date = new Date(data.updated);
+                const timeStr = date.toLocaleString('pl-PL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                document.getElementById('update-time').textContent = timeStr;
+            }
+        }
+
+        // Załaduj przy otwarciu
+        window.addEventListener('load', loadPromotions);
+
+        // Odświeżaj co godzinę
+        setInterval(loadPromotions, 60 * 60 * 1000);
+    </script>
+</body>
+</html>
