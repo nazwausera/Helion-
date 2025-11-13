@@ -7,11 +7,24 @@ from datetime import datetime
 API_KEY = os.getenv("SCRAPINGBEE_API_KEY")
 
 def fetch_with_scrapingbee(url):
-    api_url = f"https://app.scrapingbee.com/api/v1/?api_key={API_KEY}&url={url}&render_js=true"
-    response = requests.get(api_url, timeout=30)
+    api_url = (
+        f"https://app.scrapingbee.com/api/v1/"
+        f"?api_key={API_KEY}"
+        f"&url={url}"
+        f"&render_js=true"
+        f"&wait=3000"
+        f"&block_resources=false"
+    )
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 "
+        "Safari/537.36"
+    }
+    response = requests.get(api_url, headers=headers, timeout=30)
     response.raise_for_status()
-    print(f"\n=== HTML {url} ===\n")
-    print(response.text[:3000])  # Podgląd pierwszych 3000 znaków
+    print(f"\nSCRAPINGBEE_API_KEY: {API_KEY}\n")
+    print(f"\n=== HTML zawartość {url} (pierwsze 3000 znaków) ===\n")
+    print(response.text[:3000])
     print(f"\n=== KONIEC HTML {url} ===\n")
     return response.text
 
@@ -81,7 +94,6 @@ def get_promotions_ebookpoint():
     return results
 
 def main():
-    print("SCRAPINGBEE_API_KEY:", API_KEY)
     promotions = []
     promotions.extend(get_promotions_helion())
     promotions.extend(get_promotions_onepress())
@@ -89,6 +101,7 @@ def main():
     out = {"updated": datetime.now().isoformat(), "promotions": promotions}
     with open("promocje.json", "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
+    print(f"\nZapisano {len(promotions)} promocji do promocje.json\n")
 
 if __name__ == "__main__":
     main()
