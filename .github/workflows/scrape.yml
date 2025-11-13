@@ -1,32 +1,27 @@
-name: Scrape Promotions
-
-on:
-  schedule:
-    - cron: '0 8 * * *'
-  workflow_dispatch:
-
 jobs:
   scrape:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    
+
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install packages
       run: |
         pip install requests beautifulsoup4
-    
+
     - name: Run scraper
+      env:
+        SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
       run: python scraper.py
-    
+
     - name: Commit results
       run: |
         git config user.name "GitHub Action"
