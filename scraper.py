@@ -4,30 +4,27 @@ import os
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-# Pobierz API Key ze zmiennej środowiskowej (GitHub Actions)
 API_KEY = os.getenv("SCRAPINGBEE_API_KEY")
-print("SCRAPINGBEE_API_KEY:", API_KEY)
-
-
 
 def fetch_with_scrapingbee(url):
     api_url = f"https://app.scrapingbee.com/api/v1/?api_key={API_KEY}&url={url}&render_js=true"
     response = requests.get(api_url, timeout=30)
     response.raise_for_status()
+    print(f"\n=== HTML {url} ===\n")
+    print(response.text[:3000])  # Podgląd pierwszych 3000 znaków
+    print(f"\n=== KONIEC HTML {url} ===\n")
     return response.text
 
 def get_promotions_helion():
     html = fetch_with_scrapingbee("https://helion.pl/")
     soup = BeautifulSoup(html, "html.parser")
     results = []
-    # Przykład: szuka promocji w bloku 'promo-book-const'
     items = soup.find_all("div", class_="promo-book-const")
-    for i, item in enumerate(items[:2]):  # Książka tygodnia i kurs tygodnia
+    print("Znaleziono kontenerów Helion:", len(items))
+    for i, item in enumerate(items[:2]):
         book_info = item.find("div", class_="book-of-day-container")
-        if not book_info:
-            continue
-        title_elem = book_info.find("a")
-        price_elem = book_info.find("div", class_="book-of-day-price-info")
+        title_elem = book_info.find("a") if book_info else None
+        price_elem = book_info.find("div", class_="book-of-day-price-info") if book_info else None
         title = title_elem.get_text(strip=True) if title_elem else "Brak tytułu"
         price = price_elem.get_text(strip=True) if price_elem else "Brak ceny"
         promo_type = "Książka Tygodnia" if i == 0 else "Kurs Tygodnia"
@@ -45,12 +42,11 @@ def get_promotions_onepress():
     soup = BeautifulSoup(html, "html.parser")
     results = []
     items = soup.find_all("div", class_="promo-book-const")
-    for item in items[:1]:  # Książka tygodnia
+    print("Znaleziono kontenerów Onepress:", len(items))
+    for item in items[:1]:
         book_info = item.find("div", class_="book-of-day-container")
-        if not book_info:
-            continue
-        title_elem = book_info.find("a")
-        price_elem = book_info.find("div", class_="book-of-day-price-info")
+        title_elem = book_info.find("a") if book_info else None
+        price_elem = book_info.find("div", class_="book-of-day-price-info") if book_info else None
         title = title_elem.get_text(strip=True) if title_elem else "Brak tytułu"
         price = price_elem.get_text(strip=True) if price_elem else "Brak ceny"
         results.append({
@@ -67,13 +63,12 @@ def get_promotions_ebookpoint():
     soup = BeautifulSoup(html, "html.parser")
     results = []
     items = soup.find_all("div", class_="promo-book-const")
+    print("Znaleziono kontenerów Ebookpoint:", len(items))
     types = ["Książka Dnia", "Audiobook Dnia", "Kurs Tygodnia"]
-    for i, item in enumerate(items[:3]):  # Trzy promocje dzienne
+    for i, item in enumerate(items[:3]):
         book_info = item.find("div", class_="book-of-day-container")
-        if not book_info:
-            continue
-        title_elem = book_info.find("a")
-        price_elem = book_info.find("div", class_="book-of-day-price-info")
+        title_elem = book_info.find("a") if book_info else None
+        price_elem = book_info.find("div", class_="book-of-day-price-info") if book_info else None
         title = title_elem.get_text(strip=True) if title_elem else "Brak tytułu"
         price = price_elem.get_text(strip=True) if price_elem else "Brak ceny"
         results.append({
@@ -86,6 +81,7 @@ def get_promotions_ebookpoint():
     return results
 
 def main():
+    print("SCRAPINGBEE_API_KEY:", API_KEY)
     promotions = []
     promotions.extend(get_promotions_helion())
     promotions.extend(get_promotions_onepress())
