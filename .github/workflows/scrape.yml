@@ -1,1 +1,35 @@
+name: Scrape Promotions
 
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Codziennie o 9:00 UTC
+  workflow_dispatch:     # Możesz też uruchomić ręcznie
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests beautifulsoup4
+    
+    - name: Run scraper
+      run: python scraper.py
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add promocje.json
+        git commit -m "Update promotions - $(date)" || echo "No changes to commit"
+        git push
