@@ -6,6 +6,8 @@ from datetime import datetime
 
 # Pobierz API Key ze zmiennej środowiskowej (GitHub Actions)
 API_KEY = os.getenv("SCRAPINGBEE_API_KEY")
+print("SCRAPINGBEE_API_KEY:", RLGKV6OR1JXDJBEQV3KLNMCMARG5GJD0B68VKMB8QNKJDDLBMN1NE11ZH87WC7DTYT4X0LBQKDNV91GI)
+
 
 def fetch_with_scrapingbee(url):
     api_url = f"https://app.scrapingbee.com/api/v1/?api_key={API_KEY}&url={url}&render_js=true"
